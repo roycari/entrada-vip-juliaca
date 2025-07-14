@@ -85,28 +85,32 @@
 
       if (qrCodeMessage.startsWith(validBase)) {
         document.getElementById("mensaje").innerText = "✅ Código válido. Redirigiendo...";
-        html5QrcodeScanner.clear().then(_ => {
+        scanner.stop().then(() => {
           const finalURL = `${validBase}?invitado=${encodeURIComponent(finalInvitado)}&anfitrion=${encodeURIComponent(finalAnfitrion)}&codigo=${encodeURIComponent(finalCodigo)}&cookieverificada=1`;
           setTimeout(() => {
             window.location.href = finalURL;
           }, 1000);
-        }).catch(error => {
-          console.error("Error al detener el escáner:", error);
-        });
+        }).catch(err => console.error("Error al detener escáner:", err));
       } else {
         document.getElementById("mensaje").innerText = "❌ Código no válido. Escanea uno generado por el sistema.";
       }
     }
 
     function onScanFailure(error) {
-      // errores de escaneo silenciados
+      // Errores silenciados
     }
 
-    const html5QrcodeScanner = new Html5QrcodeScanner(
-      "reader", { fps: 10, qrbox: 250 }, false
-    );
-    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    const scanner = new Html5Qrcode("reader");
+
+    scanner.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: 250 },
+      onScanSuccess,
+      onScanFailure
+    ).catch(err => {
+      document.getElementById("mensaje").innerText = "❌ Error al iniciar la cámara: " + err;
+      console.error("No se pudo iniciar escáner:", err);
+    });
   </script>
 </body>
 </html>
-
