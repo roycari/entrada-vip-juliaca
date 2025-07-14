@@ -22,6 +22,11 @@
       color: #00bfff;
       margin-bottom: 20px;
     }
+    #estado {
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
     #scanner-container {
       position: relative;
       width: 90vw;
@@ -72,6 +77,7 @@
 </head>
 <body>
   <h1>Escanea tu entrada al evento</h1>
+  <div id="estado">🧠 Verificando acceso con código guardado...</div>
   <div id="scanner-container">
     <video id="preview" autoplay muted playsinline></video>
     <div class="scanner-line"></div>
@@ -159,7 +165,6 @@
     }
 
     window.onload = () => {
-      // Recuperar código de acceso desde URL previa, si existe
       const params = new URLSearchParams(window.location.search);
       const codigo = params.get("codigo") || params.get("c") || "";
       if (codigo) {
