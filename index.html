@@ -84,7 +84,7 @@
 
         // Generar URL prellenada para JotForm
         const baseUrl = "https://form.jotform.com/251940670923055";
-        const prefillURL = `${baseUrl}?invitado=${encodeURIComponent(invitado)}&anfitrion=${encodeURIComponent(anfitrion)}`;
+        const prefillURL = `${baseUrl}?invitado=${encodeURIComponent(invitado)}&anfitrion=${encodeURIComponent(anfitrion)}&cookieverificada=1`;
 
         // Generar QR dinámico
         QRCode.toDataURL(prefillURL, { width: qrSize }, (err, url) => {
