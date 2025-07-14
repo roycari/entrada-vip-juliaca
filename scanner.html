@@ -86,7 +86,7 @@
       if (qrCodeMessage.startsWith(validBase)) {
         document.getElementById("mensaje").innerText = "✅ Código válido. Redirigiendo...";
         scanner.stop().then(() => {
-          const finalURL = `${validBase}?invitado=${encodeURIComponent(finalInvitado)}&anfitrion=${encodeURIComponent(finalAnfitrion)}&codigo=${encodeURIComponent(finalCodigo)}&cookieverificada=1`;
+          const finalURL = `${validBase}?invitado=${encodeURIComponent(finalInvitado)}&anfitrion=${encodeURIComponent(finalAnfitrion)}&codigo=${encodeURIComponent(finalCodigo)}&cookieverificada=1`; 
           setTimeout(() => {
             window.location.href = finalURL;
           }, 1000);
