@@ -78,6 +78,8 @@
           return;
         }
 
+        document.getElementById("mensaje").innerText = `✅ QR leído:\nInvitado: ${finalInvitado}\nAnfitrión: ${finalAnfitrion}`;
+
         if (localStorage.getItem("verificado") === "ok" && finalCodigo) {
           localStorage.setItem("invitado", finalInvitado);
           localStorage.setItem("anfitrion", finalAnfitrion);
@@ -93,20 +95,16 @@
               window.location.href = finalURL;
             }, 1200);
           }).catch(err => console.error("Error al detener escáner:", err));
-
-        } else {
-          document.getElementById("mensaje").innerText = `✅ QR leído:\nInvitado: ${finalInvitado}\nAnfitrión: ${finalAnfitrion}\n\n⚠️ Pero necesitas verificar tu código de acceso antes de registrar.`;
         }
 
       } catch (e) {
         console.error("Error procesando QR:", e);
         document.getElementById("mensaje").innerText = "❌ Error procesando el QR. Inténtalo de nuevo.";
-        return;
       }
     }
 
     function onScanFailure(error) {
-      // Errores silenciados
+      // Silenciar errores menores
     }
 
     const scanner = new Html5Qrcode("reader");
@@ -123,4 +121,3 @@
   </script>
 </body>
 </html>
-
