@@ -4,19 +4,47 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Generador Entrada VIP - Juliaca</title>
+  <title>Generador Entrada VIP Juliaca</title>
   <style>
-    body { background: #000; color: #fff; font-family: sans-serif; text-align: center; }
-    input, button { padding: 10px; margin: 5px; border-radius: 5px; border: none; }
-    input { width: 70%; }
-    button { background: #00bfff; color: #fff; cursor: pointer; }
-    canvas { margin-top: 20px; max-width: 100%; }
+    body {
+      background: #000;
+      color: #fff;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
+    input, button {
+      padding: 15px;
+      margin: 10px;
+      border-radius: 5px;
+      border: none;
+      font-size: 18px;
+    }
+    input {
+      width: 90%;
+      max-width: 400px;
+    }
+    button {
+      background: #00bfff;
+      color: #fff;
+      cursor: pointer;
+    }
+    canvas {
+      margin-top: 20px;
+      max-width: 100%;
+    }
   </style>
 </head>
 <body>
-  <h2>Generar Entrada VIP</h2>
+  <h1>Generador de Entradas – Juliaca</h1>
   <input id="invitado" placeholder="Nombre del Invitado" />
-  <input id="invitador" placeholder="Nombre del Invitador" />
+  <br>
+  <input id="invitador" placeholder="Nombre del Invitador (Código)" />
+  <br>
   <button onclick="generar()">Generar y Descargar</button>
   <canvas id="canvas"></canvas>
 
@@ -46,24 +74,27 @@
         ctx.fillStyle = "#000";
         ctx.fillRect(0, 0, finalWidth, finalHeight);
 
-        // Ticket a la izquierda
+        // Dibujar ticket
         ctx.drawImage(img, 0, 0);
 
-        // Generar QR con datos
-        const qrData = `${invitado}\nCÓDIGO: ${invitador}`;
-        QRCode.toDataURL(qrData, { width: qrSize }, (err, url) => {
+        // Generar URL prellenada para JotForm
+        const baseUrl = "https://form.jotform.com/251940670923055";
+        const prefillURL = `${baseUrl}?invitado=${encodeURIComponent(invitado)}&codigo=${encodeURIComponent(invitador)}`;
+
+        // Generar QR dinámico
+        QRCode.toDataURL(prefillURL, { width: qrSize }, (err, url) => {
           const qr = new Image();
           qr.onload = () => {
             const qrX = ticketWidth + (finalWidth - ticketWidth - qrSize) / 2;
             const qrY = (finalHeight - qrSize - 130) / 2;
             ctx.drawImage(qr, qrX, qrY, qrSize, qrSize);
 
-            ctx.fillStyle = '#00ffff';
-            ctx.font = '42px Arial';
+            // Texto centrado debajo del QR
+            ctx.fillStyle = "#00ffff";
+            ctx.font = "42px Arial";
             ctx.fillText(invitado, qrX, qrY + qrSize + 40);
-            ctx.fillText("CÓDIGO: " + invitador, qrX, qrY + qrSize + 95);
+            ctx.fillText("CÓDIGO: " + invitador, qrX, qrY + qrSize + 100);
 
-            // Descargar
             setTimeout(() => {
               const a = document.createElement('a');
               a.href = canvas.toDataURL('image/png');
