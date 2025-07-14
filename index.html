@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Generador de Entradas VIP</title>
+  <style>
+    body { background: #000; color:#fff; font-family:sans-serif; text-align:center; }
+    canvas { max-width:90%; margin-top:20px; border:1px solid #333; }
+    input, button { padding:10px; margin:5px; border-radius:5px; border:none; }
+    input { width:70%; }
+    button { background:#00bfff; color:#fff; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <h1>Entrada VIP - Taller Trading Juliaca</h1>
+  <input id="invitado" placeholder="Nombre del Invitado"><br>
+  <input id="invitador" placeholder="Nombre del Invitador"><br>
+  <button onclick="generar()">Generar y Descargar</button>
+  <canvas id="canvas"></canvas>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script>
+    async function generar() {
+      const invitado = document.getElementById('invitado').value;
+      const invitador = document.getElementById('invitador').value;
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      img.src = 'ticket.png';
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img,0,0);
+        ctx.fillStyle = '#00bfff';
+        ctx.font = '24px Arial';
+        ctx.fillText(invitado, 50, 90);
+        ctx.fillText("Invitado por: " + invitador, 50, img.height - 60);
+        QRCode.toDataURL(
+          `Invitado: ${invitado}\nInvitado por: ${invitador}`,
+          { width: 150 },
+          function (err, url) {
+            const qr = new Image();
+            qr.onload = () => ctx.drawImage(qr, img.width - 180, img.height - 180, 150,150);
+            qr.src = url;
+            setTimeout(() => {
+              const a = document.createElement('a');
+              a.href = canvas.toDataURL('image/png');
+              a.download = 'entrada_'+invitado+'.png';
+              a.click();
+            }, 300);
+          }
+        );
+      };
+    }
+  </script>
+</body>
+</html>
