@@ -40,23 +40,6 @@
     const lector = new Html5Qrcode("reader");
     const validBase = "https://form.jotform.com/251940670923055";
 
-    function agregarVerificacion(url) {
-      let finalUrl = url;
-      const yaTieneParametros = url.includes("?");
-
-      if (localStorage.getItem("verificado") === "ok") {
-        finalUrl += yaTieneParametros ? "&cookieverificada=1" : "?cookieverificada=1";
-
-        // Agregar el último código si existe
-        const ultimoCodigo = localStorage.getItem("codigoAcceso");
-        if (ultimoCodigo) {
-          finalUrl += `&codigo=${encodeURIComponent(ultimoCodigo)}`;
-        }
-      }
-
-      return finalUrl;
-    }
-
     lector.start(
       { facingMode: "environment" },
       {
@@ -66,18 +49,32 @@
       qrCodeMessage => {
         console.log("QR leído:", qrCodeMessage);
 
-        // Capturar código de acceso si viene incluido en el QR
-        const codigoParam = new URL(qrCodeMessage).searchParams.get("codigo");
-        if (codigoParam) {
-          localStorage.setItem("codigoAcceso", codigoParam);
+        const url = new URL(qrCodeMessage);
+        const params = url.searchParams;
+
+        // Capturar datos del QR (si es primer escaneo)
+        const invitado = params.get("invitado");
+        const anfitrion = params.get("anfitrion");
+        const codigo = params.get("codigo");
+
+        if (invitado && anfitrion && codigo) {
+          localStorage.setItem("invitado", invitado);
+          localStorage.setItem("anfitrion", anfitrion);
+          localStorage.setItem("codigoAcceso", codigo);
+          localStorage.setItem("verificado", "ok");
         }
 
         if (qrCodeMessage.startsWith(validBase)) {
-          localStorage.setItem("verificado", "ok");
           document.getElementById("mensaje").innerText = "✅ Código válido. Redirigiendo...";
           lector.stop();
 
-          const finalURL = agregarVerificacion(qrCodeMessage);
+          // Construir URL final usando localStorage
+          const finalInvitado = localStorage.getItem("invitado") || "";
+          const finalAnfitrion = localStorage.getItem("anfitrion") || "";
+          const finalCodigo = localStorage.getItem("codigoAcceso") || "";
+
+          const finalURL = `${validBase}?invitado=${encodeURIComponent(finalInvitado)}&anfitrion=${encodeURIComponent(finalAnfitrion)}&codigo=${encodeURIComponent(finalCodigo)}&cookieverificada=1`;
+
           setTimeout(() => {
             window.location.href = finalURL;
           }, 1000);
@@ -92,4 +89,5 @@
   </script>
 </body>
 </html>
+
 
