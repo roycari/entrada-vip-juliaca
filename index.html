@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -43,7 +42,7 @@
   <h1>Generador de Entradas – Juliaca</h1>
   <input id="invitado" placeholder="Nombre del Invitado" />
   <br>
-  <input id="invitador" placeholder="Anfitrión" />
+  <input id="anfitrion" placeholder="Anfitrión" />
   <br>
   <button onclick="generar()">Generar y Descargar</button>
   <canvas id="canvas"></canvas>
@@ -52,8 +51,8 @@
   <script>
     function generar() {
       const invitado = document.getElementById('invitado').value.trim();
-      const invitador = document.getElementById('invitador').value.trim();
-      if (!invitado || !invitador) return alert("Completa ambos campos");
+      const anfitrion = document.getElementById('anfitrion').value.trim();
+      if (!invitado || !anfitrion) return alert("Completa ambos campos");
 
       const canvas = document.getElementById('canvas');
       const ctx = canvas.getContext('2d');
@@ -79,7 +78,7 @@
 
         // Generar URL prellenada para JotForm
         const baseUrl = "https://form.jotform.com/251940670923055";
-        const prefillURL = `${baseUrl}?invitado=${encodeURIComponent(invitado)}&codigo=${encodeURIComponent(invitador)}`;
+        const prefillURL = `${baseUrl}?invitado=${encodeURIComponent(invitado)}&anfitrion=${encodeURIComponent(anfitrion)}`;
 
         // Generar QR dinámico
         QRCode.toDataURL(prefillURL, { width: qrSize }, (err, url) => {
@@ -93,7 +92,7 @@
             ctx.fillStyle = "#00ffff";
             ctx.font = "42px Arial";
             ctx.fillText(invitado, qrX, qrY + qrSize + 40);
-            ctx.fillText("ANFITRIÓN: " + invitador, qrX, qrY + qrSize + 100);
+            ctx.fillText("ANFITRIÓN: " + anfitrion, qrX, qrY + qrSize + 100);
 
             setTimeout(() => {
               const a = document.createElement('a');
