@@ -78,29 +78,31 @@
           return;
         }
 
-        localStorage.setItem("verificado", "ok");
-        localStorage.setItem("invitado", finalInvitado);
-        localStorage.setItem("anfitrion", finalAnfitrion);
+        // Solo guardar si ya hay un código verificado anteriormente
+        if (localStorage.getItem("verificado") === "ok" && finalCodigo) {
+          localStorage.setItem("invitado", finalInvitado);
+          localStorage.setItem("anfitrion", finalAnfitrion);
+
+          const msgEl = document.getElementById("mensaje");
+          msgEl.innerText = `🎉 Registro confirmado.\nInvitado: ${finalInvitado}\nAnfitrión: ${finalAnfitrion}\nRedirigiendo al formulario...`;
+          msgEl.classList.add("animate");
+          document.getElementById("successSound").play();
+
+          scanner.stop().then(() => {
+            const finalURL = `${validBase}?invitado=${encodeURIComponent(finalInvitado)}&anfitrion=${encodeURIComponent(finalAnfitrion)}&codigo=${encodeURIComponent(finalCodigo)}&cookieverificada=1`;
+            setTimeout(() => {
+              window.location.href = finalURL;
+            }, 1200);
+          }).catch(err => console.error("Error al detener escáner:", err));
+
+        } else {
+          document.getElementById("mensaje").innerText = "⚠️ Esta sesión no ha sido verificada. Primero accede con un código válido.";
+        }
 
       } catch (e) {
         console.error("Error procesando QR:", e);
         document.getElementById("mensaje").innerText = "❌ Error procesando el QR. Inténtalo de nuevo.";
         return;
-      }
-
-      if (qrCodeMessage.includes(validBase)) {
-        const msgEl = document.getElementById("mensaje");
-        msgEl.innerText = `🎉 Registro confirmado.\nInvitado: ${finalInvitado}\nAnfitrión: ${finalAnfitrion}\nRedirigiendo al formulario...`;
-        msgEl.classList.add("animate");
-        document.getElementById("successSound").play();
-        scanner.stop().then(() => {
-          const finalURL = `${validBase}?invitado=${encodeURIComponent(finalInvitado)}&anfitrion=${encodeURIComponent(finalAnfitrion)}&codigo=${encodeURIComponent(finalCodigo)}&cookieverificada=1`;
-          setTimeout(() => {
-            window.location.href = finalURL;
-          }, 1200);
-        }).catch(err => console.error("Error al detener escáner:", err));
-      } else {
-        document.getElementById("mensaje").innerText = "❌ Código no válido.\nEscanea uno generado por el sistema.";
       }
     }
 
@@ -122,4 +124,3 @@
   </script>
 </body>
 </html>
-
