@@ -59,6 +59,8 @@
     function onScanSuccess(qrCodeMessage) {
       console.log("QR leído:", qrCodeMessage);
 
+      let finalInvitado = "";
+      let finalAnfitrion = "";
       let finalCodigo = localStorage.getItem("codigoAcceso")?.trim() || "";
 
       try {
@@ -68,28 +70,36 @@
         const invitado = (params.get("invitado") || "").trim();
         const anfitrion = (params.get("anfitrion") || "").trim();
 
-        // Validación estricta
-        if (!invitado || !anfitrion) {
-          document.getElementById("mensaje").innerText = `❌ Datos incompletos en el QR.\nAsegúrate de incluir 'invitado' y 'anfitrion'.`;
+        finalInvitado = invitado;
+
+        finalAnfitrion = anfitrion;
+
+        if (!finalInvitado || !finalAnfitrion) {
+          document.getElementById("mensaje").innerText = `❌ Datos incompletos.\nInvitado: '${finalInvitado}'\nAnfitrión: '${finalAnfitrion}'\nVerifica que el QR incluya los datos completos.`;
           return;
         }
 
-        // Registro exitoso
-        const msgEl = document.getElementById("mensaje");
-        msgEl.innerText = "🎉 Registro confirmado.\nTe estamos redirigiendo al formulario de acceso.";
-        msgEl.classList.add("animate");
-        document.getElementById("successSound").play();
-
-        scanner.stop().then(() => {
-          const finalURL = `${validBase}?invitado=${encodeURIComponent(invitado)}&anfitrion=${encodeURIComponent(anfitrion)}&codigo=${encodeURIComponent(finalCodigo)}&cookieverificada=1`;
-          setTimeout(() => {
-            window.location.href = finalURL;
-          }, 1000);
-        }).catch(err => console.error("Error al detener escáner:", err));
+        localStorage.setItem("verificado", "ok");
 
       } catch (e) {
         console.error("Error procesando QR:", e);
         document.getElementById("mensaje").innerText = "❌ Error procesando el QR. Inténtalo de nuevo.";
+        return;
+      }
+
+      if (qrCodeMessage.includes(validBase)) {
+        const msgEl = document.getElementById("mensaje");
+        msgEl.innerText = "🎉 Registro confirmado.\nTe estamos redirigiendo al formulario de acceso.";
+        msgEl.classList.add("animate");
+        document.getElementById("successSound").play();
+        scanner.stop().then(() => {
+          const finalURL = `${validBase}?invitado=${encodeURIComponent(finalInvitado)}&anfitrion=${encodeURIComponent(finalAnfitrion)}&codigo=${encodeURIComponent(finalCodigo)}&cookieverificada=1`;
+          setTimeout(() => {
+            window.location.href = finalURL;
+          }, 1000);
+        }).catch(err => console.error("Error al detener escáner:", err));
+      } else {
+        document.getElementById("mensaje").innerText = "❌ Código no válido.\nEscanea uno generado por el sistema.";
       }
     }
 
