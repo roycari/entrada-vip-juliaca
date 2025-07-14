@@ -162,14 +162,22 @@
     }
 
     window.onload = () => {
-      iniciarScanner();
-    };
-
-    document.getElementById("reintentar").addEventListener("click", () => {
       const params = new URLSearchParams(window.location.search);
       const codigo = params.get("codigo") || params.get("c") || "";
       if (codigo) {
         localStorage.setItem("codigoAcceso", codigo);
+      }
+      iniciarScanner();
+    };
+
+    document.getElementById("reintentar").addEventListener("click", () => {
+      const codigoGuardado = localStorage.getItem("codigoAcceso");
+      if (!codigoGuardado) {
+        const params = new URLSearchParams(window.location.search);
+        const codigo = params.get("codigo") || params.get("c") || "";
+        if (codigo) {
+          localStorage.setItem("codigoAcceso", codigo);
+        }
       }
       iniciarScanner();
     });
