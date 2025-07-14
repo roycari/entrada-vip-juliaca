@@ -44,39 +44,31 @@
 
       let finalInvitado = "";
       let finalAnfitrion = "";
-      let finalCodigo = "";
+      let finalCodigo = localStorage.getItem("codigoAcceso")?.trim() || ""; // Solo desde localStorage
 
       try {
         const url = new URL(qrCodeMessage);
         const params = new URLSearchParams(url.search);
 
-        const invitado = params.get("invitado")?.trim() || "";
-        const anfitrion = params.get("anfitrion")?.trim() || "";
-        const codigo = params.get("codigo")?.trim() || "";
+        const invitado = params.get("invitado")?.trim();
+        const anfitrion = params.get("anfitrion")?.trim();
 
-        if (invitado) {
+        if (invitado && invitado.length > 0) {
           localStorage.setItem("invitado", invitado);
           finalInvitado = invitado;
         } else {
           finalInvitado = localStorage.getItem("invitado")?.trim() || "";
         }
 
-        if (anfitrion) {
+        if (anfitrion && anfitrion.length > 0) {
           localStorage.setItem("anfitrion", anfitrion);
           finalAnfitrion = anfitrion;
         } else {
           finalAnfitrion = localStorage.getItem("anfitrion")?.trim() || "";
         }
 
-        if (codigo) {
-          localStorage.setItem("codigoAcceso", codigo);
-          finalCodigo = codigo;
-        } else {
-          finalCodigo = localStorage.getItem("codigoAcceso")?.trim() || "";
-        }
-
         if (!finalInvitado || !finalAnfitrion || !finalCodigo) {
-          document.getElementById("mensaje").innerText = "❌ Datos incompletos en el QR. Asegúrate de escanear un código válido.";
+          document.getElementById("mensaje").innerText = `❌ Datos incompletos. Invitado: '${finalInvitado}' | Anfitrión: '${finalAnfitrion}' | Código: '${finalCodigo}'.\nVerifica que el QR incluya todos los datos o que ya hayas verificado antes.`;
           return;
         }
 
@@ -119,3 +111,4 @@
   </script>
 </body>
 </html>
+
