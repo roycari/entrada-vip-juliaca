@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Escanea tu entrada al evento</title>
   <style>
     body {
@@ -34,7 +34,7 @@
       font-size: 18px;
       color: #ff4444;
     }
-    #btn-iniciar, #reintentar {
+    button {
       margin-top: 20px;
       padding: 12px 24px;
       font-size: 16px;
@@ -44,18 +44,15 @@
       color: white;
       cursor: pointer;
     }
-    #reintentar {
-      display: none;
-    }
   </style>
 </head>
 <body>
   <h1>Escanea tu entrada al evento</h1>
   <video id="preview" autoplay muted playsinline></video>
   <div id="mensaje"></div>
-  <button id="btn-iniciar">Iniciar escaneo</button>
-  <button id="reintentar" onclick="iniciarScanner()">Reintentar escaneo</button>
+  <button onclick="iniciarScanner()">Iniciar escaneo</button>
 
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
   <script>
     let stream;
 
@@ -63,7 +60,7 @@
       const video = document.getElementById("preview");
       const constraints = {
         video: {
-          facingMode: { exact: "environment" }
+          facingMode: "environment"
         },
         audio: false
       };
@@ -74,8 +71,9 @@
         video.setAttribute("playsinline", true);
         video.play();
         escanearCodigo(video);
+        document.getElementById("mensaje").innerText = "Escaneando QR...";
       } catch (error) {
-        document.getElementById("mensaje").innerText = "No se pudo acceder a la cámara. Revisa los permisos.";
+        document.getElementById("mensaje").innerText = "No se pudo acceder a la cámara. Revisa permisos en tu navegador.";
       }
     }
 
@@ -113,17 +111,15 @@
         const anfitrion = params.get("codigo");
 
         if (invitado && anfitrion) {
+          document.getElementById("mensaje").innerText = "¡QR válido! Redirigiendo...";
           window.location.href = `https://form.jotform.com/251940670923055?invitado=${encodeURIComponent(invitado)}&codigo=${encodeURIComponent(anfitrion)}`;
         } else {
-          document.getElementById("mensaje").innerText = "QR inválido. Verifica los datos.";
+          document.getElementById("mensaje").innerText = "QR inválido. Faltan datos.";
         }
       } catch (e) {
-        document.getElementById("mensaje").innerText = "No se pudo interpretar el QR.";
+        document.getElementById("mensaje").innerText = "Error al leer el QR.";
       }
     }
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 </body>
 </html>
-
-
