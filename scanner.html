@@ -34,7 +34,7 @@
       font-size: 18px;
       color: #ff4444;
     }
-    #btn-iniciar {
+    #btn-iniciar, #reintentar {
       margin-top: 20px;
       padding: 12px 24px;
       font-size: 16px;
@@ -45,14 +45,6 @@
       cursor: pointer;
     }
     #reintentar {
-      margin-top: 20px;
-      padding: 12px 24px;
-      font-size: 16px;
-      background-color: #00bfff;
-      border: none;
-      border-radius: 5px;
-      color: white;
-      cursor: pointer;
       display: none;
     }
   </style>
@@ -111,8 +103,6 @@
         const anfitrion = params.get("codigo");
 
         if (invitado && anfitrion) {
-          localStorage.setItem("verificado", "ok");
-          localStorage.setItem("codigoAcceso", anfitrion);
           window.location.href = `https://form.jotform.com/251940670923055?invitado=${encodeURIComponent(invitado)}&codigo=${encodeURIComponent(anfitrion)}`;
         } else {
           mostrarMensaje("❌ El QR no contiene datos válidos.");
