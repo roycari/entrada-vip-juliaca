@@ -71,7 +71,6 @@
         const anfitrion = (params.get("anfitrion") || "").trim();
 
         finalInvitado = invitado;
-
         finalAnfitrion = anfitrion;
 
         if (!finalInvitado || !finalAnfitrion) {
@@ -80,8 +79,8 @@
         }
 
         localStorage.setItem("verificado", "ok");
-localStorage.setItem("invitado", finalInvitado);
-localStorage.setItem("anfitrion", finalAnfitrion);
+        localStorage.setItem("invitado", finalInvitado);
+        localStorage.setItem("anfitrion", finalAnfitrion);
 
       } catch (e) {
         console.error("Error procesando QR:", e);
@@ -91,14 +90,14 @@ localStorage.setItem("anfitrion", finalAnfitrion);
 
       if (qrCodeMessage.includes(validBase)) {
         const msgEl = document.getElementById("mensaje");
-        msgEl.innerText = "🎉 Registro confirmado.\nTe estamos redirigiendo al formulario de acceso.";
+        msgEl.innerText = `🎉 Registro confirmado.\nInvitado: ${finalInvitado}\nAnfitrión: ${finalAnfitrion}\nRedirigiendo al formulario...`;
         msgEl.classList.add("animate");
         document.getElementById("successSound").play();
         scanner.stop().then(() => {
           const finalURL = `${validBase}?invitado=${encodeURIComponent(finalInvitado)}&anfitrion=${encodeURIComponent(finalAnfitrion)}&codigo=${encodeURIComponent(finalCodigo)}&cookieverificada=1`;
           setTimeout(() => {
             window.location.href = finalURL;
-          }, 1000);
+          }, 1200);
         }).catch(err => console.error("Error al detener escáner:", err));
       } else {
         document.getElementById("mensaje").innerText = "❌ Código no válido.\nEscanea uno generado por el sistema.";
