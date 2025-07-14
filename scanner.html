@@ -34,7 +34,17 @@
       font-size: 18px;
       color: #ff4444;
     }
-    button {
+    #btn-iniciar {
+      margin-top: 20px;
+      padding: 12px 24px;
+      font-size: 16px;
+      background-color: #00bfff;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+    }
+    #reintentar {
       margin-top: 20px;
       padding: 12px 24px;
       font-size: 16px;
@@ -49,13 +59,20 @@
 </head>
 <body>
   <h1>Escanea tu entrada al evento</h1>
-  <video id="preview" autoplay muted playsinline></video>
+  <video id="preview" autoplay muted playsinline style="display: none;"></video>
   <div id="mensaje"></div>
+  <button id="btn-iniciar">Iniciar escaneo</button>
   <button id="reintentar" onclick="iniciarScanner()">Reintentar escaneo</button>
 
   <script src="https://unpkg.com/html5-qrcode"></script>
   <script>
     const html5QrCode = new Html5Qrcode("preview");
+
+    document.getElementById("btn-iniciar").addEventListener("click", () => {
+      document.getElementById("preview").style.display = "block";
+      document.getElementById("btn-iniciar").style.display = "none";
+      iniciarScanner();
+    });
 
     async function iniciarScanner() {
       document.getElementById("mensaje").innerText = "";
@@ -65,7 +82,7 @@
         const devices = await Html5Qrcode.getCameras();
         if (devices && devices.length) {
           const backCam = devices.find(d => d.label.toLowerCase().includes("back")) || devices[0];
-          const config = { fps: 10, qrbox: 250 }; // no 'facingMode' to avoid iOS bug
+          const config = { fps: 10, qrbox: 250 };
 
           await html5QrCode.start(
             { deviceId: { exact: backCam.id } },
@@ -110,11 +127,6 @@
       document.getElementById("mensaje").innerText = texto;
       document.getElementById("reintentar").style.display = "inline-block";
     }
-
-    // Iniciar automáticamente en móviles
-    window.addEventListener("load", () => {
-      iniciarScanner();
-    });
   </script>
 </body>
 </html>
