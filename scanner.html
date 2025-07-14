@@ -7,9 +7,9 @@
   <style>
     body {
       margin: 0;
-      background: #000;
+      background: radial-gradient(circle at center, #0a0a0a 0%, #000000 100%);
       color: #00ffcc;
-      font-family: sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -21,6 +21,8 @@
     h1 {
       color: #00bfff;
       margin-bottom: 20px;
+      font-size: 28px;
+      text-shadow: 0 0 10px rgba(0,255,255,0.6);
     }
     #estado {
       color: #888;
@@ -30,32 +32,33 @@
     #scanner-container {
       position: relative;
       width: 90vw;
+      max-width: 480px;
       height: 60vh;
       border: 3px solid #00ffff;
-      border-radius: 10px;
+      border-radius: 16px;
       margin-bottom: 20px;
       overflow: hidden;
+      box-shadow: 0 0 20px #00ffff44;
     }
     #preview {
       width: 100%;
       height: 100%;
       object-fit: cover;
-    }
-    video::-webkit-media-controls {
-      display: none !important;
+      border-radius: 16px;
     }
     .scanner-line {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
-      height: 2px;
-      background: rgba(0, 255, 255, 0.8);
+      height: 4px;
+      background: linear-gradient(90deg, #00ffff, #00bfff);
+      box-shadow: 0 0 12px #00ffff;
       animation: scan 2s infinite;
     }
     @keyframes scan {
       0% { top: 0; }
-      50% { top: 100%; }
+      50% { top: calc(100% - 4px); }
       100% { top: 0; }
     }
     #mensaje {
@@ -65,13 +68,20 @@
     }
     #reintentar {
       margin-top: 20px;
-      padding: 12px 24px;
+      padding: 14px 28px;
       font-size: 16px;
-      background-color: #00bfff;
+      background: linear-gradient(to right, #00bfff, #00ffff);
       border: none;
-      border-radius: 5px;
-      color: white;
+      border-radius: 30px;
+      color: #000;
       cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 0 10px #00ffff88;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    #reintentar:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #00ffffcc;
     }
   </style>
 </head>
@@ -83,7 +93,7 @@
     <div class="scanner-line"></div>
   </div>
   <div id="mensaje"></div>
-  <button id="reintentar">Reintentar escaneo</button>
+  <button id="reintentar">🔁 Escanear otro código</button>
 
   <script>
     let stream;
@@ -104,8 +114,6 @@
       try {
         stream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = stream;
-        video.setAttribute("playsinline", true);
-        video.removeAttribute("controls");
         escanearCodigo(video);
       } catch (error) {
         document.getElementById("mensaje").innerText = "No se pudo acceder a la cámara. Revisa los permisos.";
@@ -118,7 +126,6 @@
 
       function escanear() {
         if (!stream) return;
-
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -146,13 +153,15 @@
 
         if (invitado && anfitrion) {
           const codigoAcceso = obtenerCodigoAccesoGuardado();
-          const url = new URL("https://form.jotform.com/251940670923055");
-          url.searchParams.set("invitado", invitado);
-          url.searchParams.set("anfitrion", anfitrion);
           if (codigoAcceso) {
+            const url = new URL("https://form.jotform.com/251940670923055");
+            url.searchParams.set("invitado", invitado);
+            url.searchParams.set("anfitrion", anfitrion);
             url.searchParams.set("codigo", codigoAcceso);
+            window.location.href = url.toString();
+          } else {
+            document.getElementById("mensaje").innerText = "⚠️ No se detectó el código de acceso. Debes escanear desde un enlace autorizado.";
           }
-          window.location.href = url.toString();
         } else {
           document.getElementById("mensaje").innerText = "QR válido, pero faltan campos requeridos (invitado o anfitrión).";
         }
