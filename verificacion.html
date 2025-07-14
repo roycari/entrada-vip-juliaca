@@ -57,17 +57,22 @@
       const permitidos = ["R25", "F25", "KEY"];
       const mensaje = document.getElementById("mensaje");
 
+      console.log("Código ingresado:", input);
+
       if (permitidos.includes(input)) {
         localStorage.setItem("verificado", "ok");
         localStorage.setItem("codigoAcceso", input);
+        console.log("Guardado verificado = ok y codigoAcceso =", input);
         mensaje.innerText = "✅ Código verificado correctamente. Redirigiendo...";
         setTimeout(() => {
           window.location.href = "scanner.html";
         }, 1500);
       } else {
+        console.warn("Código inválido ingresado:", input);
         mensaje.innerText = "❌ Código incorrecto. Intenta con otro.";
       }
     }
   </script>
 </body>
 </html>
+
