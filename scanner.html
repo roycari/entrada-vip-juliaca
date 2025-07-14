@@ -28,6 +28,7 @@
       border: 3px solid #00ffff;
       border-radius: 10px;
       margin-bottom: 20px;
+      object-fit: cover;
     }
     #mensaje {
       margin-top: 20px;
@@ -68,6 +69,9 @@
         stream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = stream;
         video.setAttribute("playsinline", true);
+        video.removeAttribute("controls");
+        video.removeAttribute("controlslist");
+        video.removeAttribute("disablePictureInPicture");
         video.play();
         escanearCodigo(video);
       } catch (error) {
@@ -105,12 +109,12 @@
       try {
         const parser = new URL(data);
         const invitado = parser.searchParams.get("invitado") || parser.searchParams.get("nombre") || "";
-        const anfitrion = parser.searchParams.get("codigo") || parser.searchParams.get("anfitrion") || "";
+        const anfitrion = parser.searchParams.get("anfitrion") || "";
 
         if (invitado && anfitrion) {
           const url = new URL("https://form.jotform.com/251940670923055");
           url.searchParams.set("invitado", invitado);
-          url.searchParams.set("codigo", anfitrion);
+          url.searchParams.set("anfitrion", anfitrion);
           window.location.href = url.toString();
         } else {
           document.getElementById("mensaje").innerText = "QR válido, pero faltan campos requeridos (invitado o anfitrión).";
