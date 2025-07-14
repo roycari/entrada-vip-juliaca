@@ -56,9 +56,37 @@
   <script src="https://unpkg.com/html5-qrcode"></script>
   <script>
     const html5QrCode = new Html5Qrcode("preview");
-    let cameraId = null;
 
-    function redirigirSiValido(qrData) {
+    async function iniciarScanner() {
+      document.getElementById("mensaje").innerText = "";
+      document.getElementById("reintentar").style.display = "none";
+
+      try {
+        const devices = await Html5Qrcode.getCameras();
+        if (devices && devices.length) {
+          const backCam = devices.find(d => d.label.toLowerCase().includes("back")) || devices[0];
+          const config = { fps: 10, qrbox: 250 }; // no 'facingMode' to avoid iOS bug
+
+          await html5QrCode.start(
+            { deviceId: { exact: backCam.id } },
+            config,
+            qrCodeMessage => {
+              html5QrCode.stop().then(() => {
+                procesarQR(qrCodeMessage);
+              });
+            },
+            error => console.warn("Escaneo fallido:", error)
+          );
+        } else {
+          mostrarMensaje("❌ No se encontraron cámaras disponibles.");
+        }
+      } catch (err) {
+        console.error(err);
+        mostrarMensaje("❌ Error al acceder a la cámara. Asegúrate de dar permisos.");
+      }
+    }
+
+    function procesarQR(qrData) {
       try {
         const url = new URL(qrData);
         const params = new URLSearchParams(url.search);
@@ -66,18 +94,15 @@
         const anfitrion = params.get("codigo");
 
         if (invitado && anfitrion) {
-          // Guardar verificación automáticamente
           localStorage.setItem("verificado", "ok");
           localStorage.setItem("codigoAcceso", anfitrion);
-
-          const nuevaURL = `https://form.jotform.com/251940670923055?invitado=${encodeURIComponent(invitado)}&codigo=${encodeURIComponent(anfitrion)}`;
-          window.location.href = nuevaURL;
+          window.location.href = `https://form.jotform.com/251940670923055?invitado=${encodeURIComponent(invitado)}&codigo=${encodeURIComponent(anfitrion)}`;
         } else {
-          mostrarMensaje("❌ Datos incompletos en el QR.");
+          mostrarMensaje("❌ El QR no contiene datos válidos.");
         }
       } catch (e) {
-        console.error("QR inválido:", e);
-        mostrarMensaje("❌ Código QR no válido.");
+        console.error(e);
+        mostrarMensaje("❌ No se pudo leer el QR.");
       }
     }
 
@@ -86,44 +111,10 @@
       document.getElementById("reintentar").style.display = "inline-block";
     }
 
-    function iniciarScanner() {
-      document.getElementById("mensaje").innerText = "";
-      document.getElementById("reintentar").style.display = "none";
-
-      Html5Qrcode.getCameras().then(cameras => {
-        if (cameras.length > 0) {
-          // Buscar cámara trasera primero
-          const backCamera = cameras.find(cam => cam.label.toLowerCase().includes("back")) || cameras[0];
-          cameraId = backCamera.id;
-
-          html5QrCode.start(
-            { deviceId: { exact: cameraId } },
-            { fps: 10, qrbox: 250 },
-            qrCodeMessage => {
-              html5QrCode.stop().then(() => {
-                redirigirSiValido(qrCodeMessage);
-              }).catch(err => {
-                mostrarMensaje("❌ Error al detener el escáner: " + err);
-              });
-            },
-            error => {
-              console.warn("Escaneo fallido:", error);
-            }
-          ).catch(err => {
-            mostrarMensaje("❌ No se pudo iniciar la cámara. Verifica permisos o usa HTTPS.");
-          });
-        } else {
-          mostrarMensaje("❌ No se encontraron cámaras disponibles.");
-        }
-      }).catch(err => {
-        mostrarMensaje("❌ Error accediendo a la cámara: " + err);
-      });
-    }
-
-    // Solicita permiso y luego inicia escaneo automáticamente en iOS
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(() => iniciarScanner())
-      .catch(err => mostrarMensaje("❌ No se pudo acceder a la cámara: " + err));
+    // Iniciar automáticamente en móviles
+    window.addEventListener("load", () => {
+      iniciarScanner();
+    });
   </script>
 </body>
 </html>
