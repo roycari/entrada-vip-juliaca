@@ -83,14 +83,13 @@
     <div class="scanner-line"></div>
   </div>
   <div id="mensaje"></div>
-  <button id="reintentar" onclick="iniciarScanner()">Reintentar escaneo</button>
+  <button id="reintentar">Reintentar escaneo</button>
 
   <script>
     let stream;
 
-    function guardarCodigoEnStorage() {
-      const codigoAcceso = localStorage.getItem("codigoAcceso");
-      return codigoAcceso ? codigoAcceso : "";
+    function obtenerCodigoAccesoGuardado() {
+      return localStorage.getItem("codigoAcceso") || "";
     }
 
     async function iniciarScanner() {
@@ -107,8 +106,6 @@
         video.srcObject = stream;
         video.setAttribute("playsinline", true);
         video.removeAttribute("controls");
-        video.removeAttribute("controlslist");
-        video.removeAttribute("disablePictureInPicture");
         escanearCodigo(video);
       } catch (error) {
         document.getElementById("mensaje").innerText = "No se pudo acceder a la cámara. Revisa los permisos.";
@@ -148,7 +145,7 @@
         const anfitrion = parser.searchParams.get("anfitrion") || "";
 
         if (invitado && anfitrion) {
-          const codigoAcceso = guardarCodigoEnStorage();
+          const codigoAcceso = obtenerCodigoAccesoGuardado();
           const url = new URL("https://form.jotform.com/251940670923055");
           url.searchParams.set("invitado", invitado);
           url.searchParams.set("anfitrion", anfitrion);
@@ -165,13 +162,17 @@
     }
 
     window.onload = () => {
+      iniciarScanner();
+    };
+
+    document.getElementById("reintentar").addEventListener("click", () => {
       const params = new URLSearchParams(window.location.search);
       const codigo = params.get("codigo") || params.get("c") || "";
       if (codigo) {
         localStorage.setItem("codigoAcceso", codigo);
       }
       iniciarScanner();
-    };
+    });
   </script>
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 </body>
