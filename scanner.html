@@ -48,45 +48,50 @@
 
       try {
         const url = new URL(qrCodeMessage);
-        const params = url.searchParams;
+        const params = new URLSearchParams(url.search);
 
-        const invitado = params.get("invitado");
-        const anfitrion = params.get("anfitrion");
-        const codigo = params.get("codigo");
+        const invitado = params.get("invitado")?.trim() || "";
+        const anfitrion = params.get("anfitrion")?.trim() || "";
+        const codigo = params.get("codigo")?.trim() || "";
 
         if (invitado) {
           localStorage.setItem("invitado", invitado);
           finalInvitado = invitado;
         } else {
-          finalInvitado = localStorage.getItem("invitado") || "";
+          finalInvitado = localStorage.getItem("invitado")?.trim() || "";
         }
 
         if (anfitrion) {
           localStorage.setItem("anfitrion", anfitrion);
           finalAnfitrion = anfitrion;
         } else {
-          finalAnfitrion = localStorage.getItem("anfitrion") || "";
+          finalAnfitrion = localStorage.getItem("anfitrion")?.trim() || "";
         }
 
         if (codigo) {
           localStorage.setItem("codigoAcceso", codigo);
           finalCodigo = codigo;
         } else {
-          finalCodigo = localStorage.getItem("codigoAcceso") || "";
+          finalCodigo = localStorage.getItem("codigoAcceso")?.trim() || "";
         }
 
-        if (invitado && anfitrion && codigo) {
-          localStorage.setItem("verificado", "ok");
+        if (!finalInvitado || !finalAnfitrion || !finalCodigo) {
+          document.getElementById("mensaje").innerText = "❌ Datos incompletos en el QR. Asegúrate de escanear un código válido.";
+          return;
         }
+
+        localStorage.setItem("verificado", "ok");
 
       } catch (e) {
         console.error("Error procesando QR:", e);
+        document.getElementById("mensaje").innerText = "❌ Error procesando el QR. Inténtalo de nuevo.";
+        return;
       }
 
-      if (qrCodeMessage.startsWith(validBase)) {
+      if (qrCodeMessage.includes(validBase)) {
         document.getElementById("mensaje").innerText = "✅ Código válido. Redirigiendo...";
         scanner.stop().then(() => {
-          const finalURL = `${validBase}?invitado=${encodeURIComponent(finalInvitado)}&anfitrion=${encodeURIComponent(finalAnfitrion)}&codigo=${encodeURIComponent(finalCodigo)}&cookieverificada=1`; 
+          const finalURL = `${validBase}?invitado=${encodeURIComponent(finalInvitado)}&anfitrion=${encodeURIComponent(finalAnfitrion)}&codigo=${encodeURIComponent(finalCodigo)}&cookieverificada=1`;
           setTimeout(() => {
             window.location.href = finalURL;
           }, 1000);
