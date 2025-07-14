@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Escáner QR – Verificación</title>
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" type="text/javascript"></script>
   <style>
     body {
       background-color: #000;
@@ -37,46 +37,76 @@
   <div id="mensaje" class="msg"></div>
 
   <script>
-    const lector = new Html5Qrcode("reader");
     const validBase = "https://form.jotform.com/251940670923055";
 
-    lector.start(
-      { facingMode: "environment" },
-      {
-        fps: 10,
-        qrbox: 250
-      },
-      qrCodeMessage => {
-        console.log("QR leído:", qrCodeMessage);
+    function onScanSuccess(qrCodeMessage) {
+      console.log("QR leído:", qrCodeMessage);
 
-        let finalInvitado = "";
-        let finalAnfitrion = "";
-        let finalCodigo = "";
+      let finalInvitado = "";
+      let finalAnfitrion = "";
+      let finalCodigo = "";
 
-        try {
-          const url = new URL(qrCodeMessage);
-          const params = url.searchParams;
+      try {
+        const url = new URL(qrCodeMessage);
+        const params = url.searchParams;
 
-          const invitado = params.get("invitado");
-          const anfitrion = params.get("anfitrion");
-          const codigo = params.get("codigo");
+        const invitado = params.get("invitado");
+        const anfitrion = params.get("anfitrion");
+        const codigo = params.get("codigo");
 
-          if (invitado) {
-            localStorage.setItem("invitado", invitado);
-            finalInvitado = invitado;
-          } else {
-            finalInvitado = localStorage.getItem("invitado") || "";
-          }
+        if (invitado) {
+          localStorage.setItem("invitado", invitado);
+          finalInvitado = invitado;
+        } else {
+          finalInvitado = localStorage.getItem("invitado") || "";
+        }
 
-          if (anfitrion) {
-            localStorage.setItem("anfitrion", anfitrion);
-            finalAnfitrion = anfitrion;
-          } else {
-            finalAnfitrion = localStorage.getItem("anfitrion") || "";
-          }
+        if (anfitrion) {
+          localStorage.setItem("anfitrion", anfitrion);
+          finalAnfitrion = anfitrion;
+        } else {
+          finalAnfitrion = localStorage.getItem("anfitrion") || "";
+        }
 
-          if (codigo) {
-            localStorage.setItem("codigoAcceso", codigo);
-            finalCodigo = codigo;
-          } else {
-            finalCodigo = localStorage.getIt
+        if (codigo) {
+          localStorage.setItem("codigoAcceso", codigo);
+          finalCodigo = codigo;
+        } else {
+          finalCodigo = localStorage.getItem("codigoAcceso") || "";
+        }
+
+        if (invitado && anfitrion && codigo) {
+          localStorage.setItem("verificado", "ok");
+        }
+
+      } catch (e) {
+        console.error("Error procesando QR:", e);
+      }
+
+      if (qrCodeMessage.startsWith(validBase)) {
+        document.getElementById("mensaje").innerText = "✅ Código válido. Redirigiendo...";
+        html5QrcodeScanner.clear().then(_ => {
+          const finalURL = `${validBase}?invitado=${encodeURIComponent(finalInvitado)}&anfitrion=${encodeURIComponent(finalAnfitrion)}&codigo=${encodeURIComponent(finalCodigo)}&cookieverificada=1`;
+          setTimeout(() => {
+            window.location.href = finalURL;
+          }, 1000);
+        }).catch(error => {
+          console.error("Error al detener el escáner:", error);
+        });
+      } else {
+        document.getElementById("mensaje").innerText = "❌ Código no válido. Escanea uno generado por el sistema.";
+      }
+    }
+
+    function onScanFailure(error) {
+      // errores de escaneo silenciados
+    }
+
+    const html5QrcodeScanner = new Html5QrcodeScanner(
+      "reader", { fps: 10, qrbox: 250 }, false
+    );
+    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+  </script>
+</body>
+</html>
+
