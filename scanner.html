@@ -49,45 +49,34 @@
       qrCodeMessage => {
         console.log("QR leído:", qrCodeMessage);
 
-        const url = new URL(qrCodeMessage);
-        const params = url.searchParams;
+        let finalInvitado = "";
+        let finalAnfitrion = "";
+        let finalCodigo = "";
 
-        // Capturar datos del QR (si es primer escaneo)
-        const invitado = params.get("invitado");
-        const anfitrion = params.get("anfitrion");
-        const codigo = params.get("codigo");
+        try {
+          const url = new URL(qrCodeMessage);
+          const params = url.searchParams;
 
-        if (invitado && anfitrion && codigo) {
-          localStorage.setItem("invitado", invitado);
-          localStorage.setItem("anfitrion", anfitrion);
-          localStorage.setItem("codigoAcceso", codigo);
-          localStorage.setItem("verificado", "ok");
-        }
+          const invitado = params.get("invitado");
+          const anfitrion = params.get("anfitrion");
+          const codigo = params.get("codigo");
 
-        if (qrCodeMessage.startsWith(validBase)) {
-          document.getElementById("mensaje").innerText = "✅ Código válido. Redirigiendo...";
-          lector.stop();
+          if (invitado) {
+            localStorage.setItem("invitado", invitado);
+            finalInvitado = invitado;
+          } else {
+            finalInvitado = localStorage.getItem("invitado") || "";
+          }
 
-          // Construir URL final usando localStorage
-          const finalInvitado = localStorage.getItem("invitado") || "";
-          const finalAnfitrion = localStorage.getItem("anfitrion") || "";
-          const finalCodigo = localStorage.getItem("codigoAcceso") || "";
+          if (anfitrion) {
+            localStorage.setItem("anfitrion", anfitrion);
+            finalAnfitrion = anfitrion;
+          } else {
+            finalAnfitrion = localStorage.getItem("anfitrion") || "";
+          }
 
-          const finalURL = `${validBase}?invitado=${encodeURIComponent(finalInvitado)}&anfitrion=${encodeURIComponent(finalAnfitrion)}&codigo=${encodeURIComponent(finalCodigo)}&cookieverificada=1`;
-
-          setTimeout(() => {
-            window.location.href = finalURL;
-          }, 1000);
-        } else {
-          document.getElementById("mensaje").innerText = "❌ Código no válido. Escanea uno generado por el sistema.";
-        }
-      },
-      error => {
-        // Silenciar errores de escaneo continuo
-      }
-    );
-  </script>
-</body>
-</html>
-
-
+          if (codigo) {
+            localStorage.setItem("codigoAcceso", codigo);
+            finalCodigo = codigo;
+          } else {
+            finalCodigo = localStorage.getIt
