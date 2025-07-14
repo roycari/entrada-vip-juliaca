@@ -78,7 +78,6 @@
           return;
         }
 
-        // Solo guardar si ya hay un código verificado anteriormente
         if (localStorage.getItem("verificado") === "ok" && finalCodigo) {
           localStorage.setItem("invitado", finalInvitado);
           localStorage.setItem("anfitrion", finalAnfitrion);
@@ -96,7 +95,7 @@
           }).catch(err => console.error("Error al detener escáner:", err));
 
         } else {
-          document.getElementById("mensaje").innerText = "⚠️ Esta sesión no ha sido verificada. Primero accede con un código válido.";
+          document.getElementById("mensaje").innerText = `✅ QR leído:\nInvitado: ${finalInvitado}\nAnfitrión: ${finalAnfitrion}\n\n⚠️ Pero necesitas verificar tu código de acceso antes de registrar.`;
         }
 
       } catch (e) {
@@ -124,3 +123,4 @@
   </script>
 </body>
 </html>
+
