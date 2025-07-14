@@ -56,48 +56,58 @@
   <button id="btn-iniciar">Iniciar escaneo</button>
   <button id="reintentar" onclick="iniciarScanner()">Reintentar escaneo</button>
 
-  <script src="https://unpkg.com/html5-qrcode"></script>
   <script>
-    const html5QrCode = new Html5Qrcode("preview");
-
-    document.getElementById("btn-iniciar").addEventListener("click", () => {
-      iniciarScanner();
-    });
+    let stream;
 
     async function iniciarScanner() {
-      document.getElementById("preview").style.display = "block";
-      document.getElementById("btn-iniciar").style.display = "none";
-      document.getElementById("mensaje").innerText = "";
-      document.getElementById("reintentar").style.display = "none";
+      const video = document.getElementById("preview");
+      const constraints = {
+        video: {
+          facingMode: { exact: "environment" }
+        },
+        audio: false
+      };
 
       try {
-        const devices = await Html5Qrcode.getCameras();
-        if (devices && devices.length) {
-          const backCam = devices.find(d => d.label.toLowerCase().includes("back")) || devices[0];
-          const config = { fps: 10, qrbox: 250 }; // QR box visible
-
-          await html5QrCode.start(
-            { deviceId: backCam.id },
-            config,
-            qrCodeMessage => {
-              html5QrCode.stop().then(() => {
-                procesarQR(qrCodeMessage);
-              }).catch(err => mostrarMensaje("❌ No se pudo detener el escáner."));
-            },
-            error => console.warn("Escaneo fallido:", error)
-          );
-        } else {
-          mostrarMensaje("❌ No se encontraron cámaras disponibles.");
-        }
-      } catch (err) {
-        console.error(err);
-        mostrarMensaje("❌ Error al acceder a la cámara. Asegúrate de dar permisos en Ajustes > Safari > Cámara.");
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = stream;
+        video.setAttribute("playsinline", true);
+        video.play();
+        escanearCodigo(video);
+      } catch (error) {
+        document.getElementById("mensaje").innerText = "No se pudo acceder a la cámara. Revisa los permisos.";
       }
     }
 
-    function procesarQR(qrData) {
+    function escanearCodigo(video) {
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+
+      function escanear() {
+        if (!stream) return;
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        try {
+          const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+          const code = jsQR(imageData.data, canvas.width, canvas.height);
+          if (code) {
+            procesarQR(code.data);
+          } else {
+            requestAnimationFrame(escanear);
+          }
+        } catch (e) {
+          requestAnimationFrame(escanear);
+        }
+      }
+      requestAnimationFrame(escanear);
+    }
+
+    function procesarQR(data) {
       try {
-        const url = new URL(qrData);
+        const url = new URL(data);
         const params = new URLSearchParams(url.search);
         const invitado = params.get("invitado");
         const anfitrion = params.get("codigo");
@@ -105,19 +115,15 @@
         if (invitado && anfitrion) {
           window.location.href = `https://form.jotform.com/251940670923055?invitado=${encodeURIComponent(invitado)}&codigo=${encodeURIComponent(anfitrion)}`;
         } else {
-          mostrarMensaje("❌ El QR no contiene datos válidos.");
+          document.getElementById("mensaje").innerText = "QR inválido. Verifica los datos.";
         }
       } catch (e) {
-        console.error(e);
-        mostrarMensaje("❌ No se pudo leer el QR correctamente.");
+        document.getElementById("mensaje").innerText = "No se pudo interpretar el QR.";
       }
     }
-
-    function mostrarMensaje(texto) {
-      document.getElementById("mensaje").innerText = texto;
-      document.getElementById("reintentar").style.display = "inline-block";
-    }
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 </body>
 </html>
+
 
