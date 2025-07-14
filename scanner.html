@@ -97,8 +97,8 @@
           cameraId = backCamera.id;
 
           html5QrCode.start(
-            cameraId,
-            { fps: 10, qrbox: { width: 250, height: 250 }, facingMode: { exact: "environment" } },
+            { deviceId: { exact: cameraId } },
+            { fps: 10, qrbox: 250 },
             qrCodeMessage => {
               html5QrCode.stop().then(() => {
                 redirigirSiValido(qrCodeMessage);
@@ -120,7 +120,11 @@
       });
     }
 
-    iniciarScanner();
+    // Solicita permiso y luego inicia escaneo automáticamente en iOS
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(() => iniciarScanner())
+      .catch(err => mostrarMensaje("❌ No se pudo acceder a la cámara: " + err));
   </script>
 </body>
 </html>
+
