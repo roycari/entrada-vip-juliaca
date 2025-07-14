@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Escanea tu entrada al evento</title>
   <style>
     body {
@@ -15,6 +15,12 @@
       align-items: center;
       justify-content: center;
       height: 100vh;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      color: #00bfff;
+      margin-bottom: 20px;
     }
     #preview {
       width: 90vw;
@@ -23,80 +29,98 @@
       border-radius: 10px;
       margin-bottom: 20px;
     }
-    h1 {
-      color: #00bfff;
-      margin-bottom: 20px;
-    }
     #mensaje {
       margin-top: 20px;
       font-size: 18px;
       color: #ff4444;
-      text-align: center;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 24px;
+      font-size: 16px;
+      background-color: #00bfff;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      display: none;
     }
   </style>
 </head>
 <body>
   <h1>Escanea tu entrada al evento</h1>
-  <video id="preview"></video>
+  <video id="preview" autoplay muted playsinline></video>
   <div id="mensaje"></div>
+  <button id="reintentar" onclick="iniciarScanner()">Reintentar escaneo</button>
 
   <script src="https://unpkg.com/html5-qrcode"></script>
   <script>
-    const verificado = localStorage.getItem("verificado");
-    const codigoAcceso = localStorage.getItem("codigoAcceso");
-
-    console.log("Verificado:", verificado);
-    console.log("Código acceso:", codigoAcceso);
+    const html5QrCode = new Html5Qrcode("preview");
+    let cameraId = null;
 
     function redirigirSiValido(qrData) {
       try {
         const url = new URL(qrData);
         const params = new URLSearchParams(url.search);
-
         const invitado = params.get("invitado");
         const anfitrion = params.get("codigo");
 
         if (invitado && anfitrion) {
-          console.log("QR contiene:", invitado, anfitrion);
+          // Guardar verificación automáticamente
+          localStorage.setItem("verificado", "ok");
+          localStorage.setItem("codigoAcceso", anfitrion);
 
-          if (verificado === "ok" && codigoAcceso) {
-            const nuevaURL = `https://form.jotform.com/251940670923055?invitado=${encodeURIComponent(invitado)}&codigo=${encodeURIComponent(anfitrion)}`;
-            window.location.href = nuevaURL;
-          } else {
-            document.getElementById("mensaje").innerText = "⚠️ Necesitas verificar tu acceso antes de registrar.";
-          }
+          const nuevaURL = `https://form.jotform.com/251940670923055?invitado=${encodeURIComponent(invitado)}&codigo=${encodeURIComponent(anfitrion)}`;
+          window.location.href = nuevaURL;
         } else {
-          document.getElementById("mensaje").innerText = "❌ Datos incompletos en el QR.";
+          mostrarMensaje("❌ Datos incompletos en el QR.");
         }
       } catch (e) {
         console.error("QR inválido:", e);
-        document.getElementById("mensaje").innerText = "❌ Código QR no válido.";
+        mostrarMensaje("❌ Código QR no válido.");
       }
     }
 
-    const html5QrCode = new Html5Qrcode("preview");
-    Html5Qrcode.getCameras().then(cameras => {
-      if (cameras && cameras.length) {
-        html5QrCode.start(
-          cameras[0].id,
-          {
-            fps: 10,
-            qrbox: { width: 250, height: 250 }
-          },
-          qrCodeMessage => {
-            html5QrCode.stop();
-            redirigirSiValido(qrCodeMessage);
-          },
-          error => {
-            // Nada
-          }
-        );
-      } else {
-        document.getElementById("mensaje").innerText = "No se encontró cámara.";
-      }
-    }).catch(err => {
-      document.getElementById("mensaje").innerText = `Error: ${err}`;
-    });
+    function mostrarMensaje(texto) {
+      document.getElementById("mensaje").innerText = texto;
+      document.getElementById("reintentar").style.display = "inline-block";
+    }
+
+    function iniciarScanner() {
+      document.getElementById("mensaje").innerText = "";
+      document.getElementById("reintentar").style.display = "none";
+
+      Html5Qrcode.getCameras().then(cameras => {
+        if (cameras.length > 0) {
+          // Buscar cámara trasera primero
+          const backCamera = cameras.find(cam => cam.label.toLowerCase().includes("back")) || cameras[0];
+          cameraId = backCamera.id;
+
+          html5QrCode.start(
+            cameraId,
+            { fps: 10, qrbox: { width: 250, height: 250 }, facingMode: { exact: "environment" } },
+            qrCodeMessage => {
+              html5QrCode.stop().then(() => {
+                redirigirSiValido(qrCodeMessage);
+              }).catch(err => {
+                mostrarMensaje("❌ Error al detener el escáner: " + err);
+              });
+            },
+            error => {
+              console.warn("Escaneo fallido:", error);
+            }
+          ).catch(err => {
+            mostrarMensaje("❌ No se pudo iniciar la cámara. Verifica permisos o usa HTTPS.");
+          });
+        } else {
+          mostrarMensaje("❌ No se encontraron cámaras disponibles.");
+        }
+      }).catch(err => {
+        mostrarMensaje("❌ Error accediendo a la cámara: " + err);
+      });
+    }
+
+    iniciarScanner();
   </script>
 </body>
 </html>
