@@ -3,120 +3,99 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Escáner QR – Verificación</title>
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" type="text/javascript"></script>
+  <title>Escanea tu entrada al evento</title>
   <style>
     body {
-      background-color: #000;
-      color: #fff;
+      margin: 0;
+      background: #000;
+      color: #00ffcc;
       font-family: sans-serif;
-      text-align: center;
-      padding: 20px;
-      animation: fadeIn 1s ease-in;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
     }
-
-    #reader {
-      width: 100%;
-      max-width: 400px;
-      margin: auto;
-      border: 2px solid #00bfff;
+    #preview {
+      width: 90vw;
+      height: 60vh;
+      border: 3px solid #00ffff;
       border-radius: 10px;
+      margin-bottom: 20px;
     }
-
     h1 {
       color: #00bfff;
       margin-bottom: 20px;
     }
-
-    .msg {
+    #mensaje {
       margin-top: 20px;
-      color: #00ffcc;
-      font-weight: bold;
       font-size: 18px;
-      white-space: pre-line;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.05); opacity: 0.8; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    .msg.animate {
-      animation: pulse 1.5s ease-in-out infinite;
+      color: #ff4444;
+      text-align: center;
     }
   </style>
-  <audio id="successSound" src="https://cdn.pixabay.com/download/audio/2022/03/28/audio_e816f3d387.mp3?filename=interface-confirmation-133125.mp3" preload="auto"></audio>
 </head>
 <body>
-  <h1>Escanea tu Entrada al Evento</h1>
-  <div id="reader"></div>
-  <div id="mensaje" class="msg"></div>
+  <h1>Escanea tu entrada al evento</h1>
+  <video id="preview"></video>
+  <div id="mensaje"></div>
 
+  <script src="https://unpkg.com/html5-qrcode"></script>
   <script>
-    const validBase = "https://form.jotform.com/251940670923055";
+    const verificado = localStorage.getItem("verificado");
+    const codigoAcceso = localStorage.getItem("codigoAcceso");
 
-    function onScanSuccess(qrCodeMessage) {
-      console.log("QR leído:", qrCodeMessage);
+    console.log("Verificado:", verificado);
+    console.log("Código acceso:", codigoAcceso);
 
-      let finalInvitado = "";
-      let finalAnfitrion = "";
-      let finalCodigo = localStorage.getItem("codigoAcceso")?.trim() || "";
-
+    function redirigirSiValido(qrData) {
       try {
-        const url = new URL(qrCodeMessage);
+        const url = new URL(qrData);
         const params = new URLSearchParams(url.search);
 
-        const invitado = (params.get("invitado") || "").trim();
-        const anfitrion = (params.get("anfitrion") || "").trim();
+        const invitado = params.get("invitado");
+        const anfitrion = params.get("codigo");
 
-        finalInvitado = invitado;
-        finalAnfitrion = anfitrion;
+        if (invitado && anfitrion) {
+          console.log("QR contiene:", invitado, anfitrion);
 
-        if (!finalInvitado || !finalAnfitrion) {
-          document.getElementById("mensaje").innerText = `❌ Datos incompletos.\nInvitado: '${finalInvitado}'\nAnfitrión: '${finalAnfitrion}'\nVerifica que el QR incluya los datos completos.`;
-          return;
+          if (verificado === "ok" && codigoAcceso) {
+            const nuevaURL = `https://form.jotform.com/251940670923055?invitado=${encodeURIComponent(invitado)}&codigo=${encodeURIComponent(anfitrion)}`;
+            window.location.href = nuevaURL;
+          } else {
+            document.getElementById("mensaje").innerText = "⚠️ Necesitas verificar tu acceso antes de registrar.";
+          }
+        } else {
+          document.getElementById("mensaje").innerText = "❌ Datos incompletos en el QR.";
         }
-
-        document.getElementById("mensaje").innerText = `✅ QR leído:\nInvitado: ${finalInvitado}\nAnfitrión: ${finalAnfitrion}`;
-
-        if (localStorage.getItem("verificado") === "ok" && finalCodigo) {
-          localStorage.setItem("invitado", finalInvitado);
-          localStorage.setItem("anfitrion", finalAnfitrion);
-
-          const msgEl = document.getElementById("mensaje");
-          msgEl.innerText = `🎉 Registro confirmado.\nInvitado: ${finalInvitado}\nAnfitrión: ${finalAnfitrion}\nRedirigiendo al formulario...`;
-          msgEl.classList.add("animate");
-          document.getElementById("successSound").play();
-
-          scanner.stop().then(() => {
-            const finalURL = `${validBase}?invitado=${encodeURIComponent(finalInvitado)}&anfitrion=${encodeURIComponent(finalAnfitrion)}&codigo=${encodeURIComponent(finalCodigo)}&cookieverificada=1`;
-            setTimeout(() => {
-              window.location.href = finalURL;
-            }, 1200);
-          }).catch(err => console.error("Error al detener escáner:", err));
-        }
-
       } catch (e) {
-        console.error("Error procesando QR:", e);
-        document.getElementById("mensaje").innerText = "❌ Error procesando el QR. Inténtalo de nuevo.";
+        console.error("QR inválido:", e);
+        document.getElementById("mensaje").innerText = "❌ Código QR no válido.";
       }
     }
 
-    function onScanFailure(error) {
-      // Silenciar errores menores
-    }
-
-    const scanner = new Html5Qrcode("reader");
-
-    scanner.start(
-      { facingMode: "environment" },
-      { fps: 10, qrbox: 250 },
-      onScanSuccess,
-      onScanFailure
-    ).catch(err => {
-      document.getElementById("mensaje").innerText = "❌ Error al iniciar la cámara: " + err;
-      console.error("No se pudo iniciar escáner:", err);
+    const html5QrCode = new Html5Qrcode("preview");
+    Html5Qrcode.getCameras().then(cameras => {
+      if (cameras && cameras.length) {
+        html5QrCode.start(
+          cameras[0].id,
+          {
+            fps: 10,
+            qrbox: { width: 250, height: 250 }
+          },
+          qrCodeMessage => {
+            html5QrCode.stop();
+            redirigirSiValido(qrCodeMessage);
+          },
+          error => {
+            // Nada
+          }
+        );
+      } else {
+        document.getElementById("mensaje").innerText = "No se encontró cámara.";
+      }
+    }).catch(err => {
+      document.getElementById("mensaje").innerText = `Error: ${err}`;
     });
   </script>
 </body>
