@@ -44,7 +44,7 @@
 
       let finalInvitado = "";
       let finalAnfitrion = "";
-      let finalCodigo = localStorage.getItem("codigoAcceso")?.trim() || ""; // Solo desde localStorage
+      let finalCodigo = localStorage.getItem("codigoAcceso")?.trim() || "";
 
       try {
         const url = new URL(qrCodeMessage);
@@ -67,8 +67,15 @@
           finalAnfitrion = localStorage.getItem("anfitrion")?.trim() || "";
         }
 
-        if (!finalInvitado || !finalAnfitrion || !finalCodigo) {
-          document.getElementById("mensaje").innerText = `❌ Datos incompletos. Invitado: '${finalInvitado}' | Anfitrión: '${finalAnfitrion}' | Código: '${finalCodigo}'.\nVerifica que el QR incluya todos los datos o que ya hayas verificado antes.`;
+        // Verificación inicial: si es la primera vez, el código no está todavía
+        // Mostrar un aviso específico
+        if (!finalCodigo) {
+          document.getElementById("mensaje").innerText = "⚠️ Falta la clave de acceso. Debes ingresar primero desde el formulario con un código válido (R25, F25 o KEY).";
+          return;
+        }
+
+        if (!finalInvitado || !finalAnfitrion) {
+          document.getElementById("mensaje").innerText = `❌ Datos incompletos. Invitado: '${finalInvitado}' | Anfitrión: '${finalAnfitrion}'.\nVerifica que el QR incluya los datos completos.`;
           return;
         }
 
@@ -111,4 +118,5 @@
   </script>
 </body>
 </html>
+
 
