@@ -7,12 +7,7 @@
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" type="text/javascript"></script>
   <style>
     body {
-      background-color: #000;
-      color: #fff;
-      font-family: sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
+      animation: fadeIn 1s ease-in;
     #reader {
       width: 100%;
       max-width: 400px;
@@ -29,10 +24,20 @@
       color: #0f0;
       font-weight: bold;
     }
+      @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .msg.animate {
+      animation: pulse 1.5s ease-in-out infinite;
+    }
   </style>
+<audio id="successSound" src="https://cdn.pixabay.com/download/audio/2022/03/28/audio_e816f3d387.mp3?filename=interface-confirmation-133125.mp3" preload="auto"></audio>
 </head>
 <body>
-  <h1>Escanea tu Código QR</h1>
+  <h1>Escanea tu Entrada al Evento</h1>
   <div id="reader"></div>
   <div id="mensaje" class="msg"></div>
 
@@ -67,13 +72,6 @@
           finalAnfitrion = localStorage.getItem("anfitrion")?.trim() || "";
         }
 
-        // Verificación inicial: si es la primera vez, el código no está todavía
-        // Mostrar un aviso específico
-        if (!finalCodigo) {
-          document.getElementById("mensaje").innerText = "⚠️ Falta la clave de acceso. Debes ingresar primero desde el formulario con un código válido (R25, F25 o KEY).";
-          return;
-        }
-
         if (!finalInvitado || !finalAnfitrion) {
           document.getElementById("mensaje").innerText = `❌ Datos incompletos. Invitado: '${finalInvitado}' | Anfitrión: '${finalAnfitrion}'.\nVerifica que el QR incluya los datos completos.`;
           return;
@@ -88,7 +86,10 @@
       }
 
       if (qrCodeMessage.includes(validBase)) {
-        document.getElementById("mensaje").innerText = "✅ Código válido. Redirigiendo...";
+        const msgEl = document.getElementById("mensaje");
+        msgEl.innerText = "🎉 Registro confirmado. Te estamos redirigiendo al formulario de acceso.";
+        msgEl.classList.add("animate");
+        document.getElementById("successSound").play();
         scanner.stop().then(() => {
           const finalURL = `${validBase}?invitado=${encodeURIComponent(finalInvitado)}&anfitrion=${encodeURIComponent(finalAnfitrion)}&codigo=${encodeURIComponent(finalCodigo)}&cookieverificada=1`;
           setTimeout(() => {
@@ -118,5 +119,4 @@
   </script>
 </body>
 </html>
-
 
