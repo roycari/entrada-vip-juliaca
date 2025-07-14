@@ -40,6 +40,13 @@
     const lector = new Html5Qrcode("reader");
     const validBase = "https://form.jotform.com/251940670923055";
 
+    function agregarVerificacion(url) {
+      if (localStorage.getItem("verificado") === "ok") {
+        return url.includes("?") ? url + "&cookieverificada=1" : url + "?cookieverificada=1";
+      }
+      return url;
+    }
+
     lector.start(
       { facingMode: "environment" },
       {
@@ -50,11 +57,15 @@
         console.log("QR leído:", qrCodeMessage);
 
         if (qrCodeMessage.startsWith(validBase)) {
+          // Guardar la verificación localmente
           localStorage.setItem("verificado", "ok");
+
           document.getElementById("mensaje").innerText = "✅ Código válido. Redirigiendo...";
           lector.stop();
+
+          const finalURL = agregarVerificacion(qrCodeMessage);
           setTimeout(() => {
-            window.location.href = qrCodeMessage;
+            window.location.href = finalURL;
           }, 1000);
         } else {
           document.getElementById("mensaje").innerText = "❌ Código no válido. Escanea uno generado por el sistema.";
@@ -67,3 +78,4 @@
   </script>
 </body>
 </html>
+
