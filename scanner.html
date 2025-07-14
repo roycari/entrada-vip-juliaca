@@ -87,7 +87,7 @@
 </head>
 <body>
   <h1>Escanea tu entrada al evento</h1>
-  <div id="estado">🧠 Verificando acceso con código guardado...</div>
+  <div id="estado">📡 Escaneando QR para registrar invitado y anfitrión...</div>
   <div id="scanner-container">
     <video id="preview" autoplay muted playsinline></video>
     <div class="scanner-line"></div>
@@ -97,10 +97,6 @@
 
   <script>
     let stream;
-
-    function obtenerCodigoAccesoGuardado() {
-      return localStorage.getItem("codigoAcceso") || "";
-    }
 
     async function iniciarScanner() {
       const video = document.getElementById("preview");
@@ -152,16 +148,14 @@
         const anfitrion = parser.searchParams.get("anfitrion") || "";
 
         if (invitado && anfitrion) {
-          const codigoAcceso = obtenerCodigoAccesoGuardado();
+          const codigoAcceso = localStorage.getItem("codigoAcceso") || "";
+          const url = new URL("https://form.jotform.com/251940670923055");
+          url.searchParams.set("invitado", invitado);
+          url.searchParams.set("anfitrion", anfitrion);
           if (codigoAcceso) {
-            const url = new URL("https://form.jotform.com/251940670923055");
-            url.searchParams.set("invitado", invitado);
-            url.searchParams.set("anfitrion", anfitrion);
             url.searchParams.set("codigo", codigoAcceso);
-            window.location.href = url.toString();
-          } else {
-            document.getElementById("mensaje").innerText = "⚠️ No se detectó el código de acceso. Debes escanear desde un enlace autorizado.";
           }
+          window.location.href = url.toString();
         } else {
           document.getElementById("mensaje").innerText = "QR válido, pero faltan campos requeridos (invitado o anfitrión).";
         }
@@ -180,14 +174,6 @@
     };
 
     document.getElementById("reintentar").addEventListener("click", () => {
-      const codigoGuardado = localStorage.getItem("codigoAcceso");
-      if (!codigoGuardado) {
-        const params = new URLSearchParams(window.location.search);
-        const codigo = params.get("codigo") || params.get("c") || "";
-        if (codigo) {
-          localStorage.setItem("codigoAcceso", codigo);
-        }
-      }
       iniciarScanner();
     });
   </script>
