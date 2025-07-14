@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Escáner QR – Verificación</title>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    #reader {
+      width: 100%;
+      max-width: 400px;
+      margin: auto;
+      border: 2px solid #00bfff;
+      border-radius: 10px;
+    }
+    h1 {
+      color: #00bfff;
+      margin-bottom: 20px;
+    }
+    .msg {
+      margin-top: 20px;
+      color: #0f0;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Escanea tu Código QR</h1>
+  <div id="reader"></div>
+  <div id="mensaje" class="msg"></div>
+
+  <script>
+    const lector = new Html5Qrcode("reader");
+    const validBase = "https://form.jotform.com/251940670923055";
+
+    lector.start(
+      { facingMode: "environment" },
+      {
+        fps: 10,
+        qrbox: 250
+      },
+      qrCodeMessage => {
+        console.log("QR leído:", qrCodeMessage);
+
+        if (qrCodeMessage.startsWith(validBase)) {
+          localStorage.setItem("verificado", "ok");
+          document.getElementById("mensaje").innerText = "✅ Código válido. Redirigiendo...";
+          lector.stop();
+          setTimeout(() => {
+            window.location.href = qrCodeMessage;
+          }, 1000);
+        } else {
+          document.getElementById("mensaje").innerText = "❌ Código no válido. Escanea uno generado por el sistema.";
+        }
+      },
+      error => {
+        // Silenciar errores de escaneo continuo
+      }
+    );
+  </script>
+</body>
+</html>
