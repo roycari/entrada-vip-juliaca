@@ -41,10 +41,20 @@
     const validBase = "https://form.jotform.com/251940670923055";
 
     function agregarVerificacion(url) {
+      let finalUrl = url;
+      const yaTieneParametros = url.includes("?");
+
       if (localStorage.getItem("verificado") === "ok") {
-        return url.includes("?") ? url + "&cookieverificada=1" : url + "?cookieverificada=1";
+        finalUrl += yaTieneParametros ? "&cookieverificada=1" : "?cookieverificada=1";
+
+        // Agregar el último código si existe
+        const ultimoCodigo = localStorage.getItem("codigoAcceso");
+        if (ultimoCodigo) {
+          finalUrl += `&codigo=${encodeURIComponent(ultimoCodigo)}`;
+        }
       }
-      return url;
+
+      return finalUrl;
     }
 
     lector.start(
@@ -56,10 +66,14 @@
       qrCodeMessage => {
         console.log("QR leído:", qrCodeMessage);
 
-        if (qrCodeMessage.startsWith(validBase)) {
-          // Guardar la verificación localmente
-          localStorage.setItem("verificado", "ok");
+        // Capturar código de acceso si viene incluido en el QR
+        const codigoParam = new URL(qrCodeMessage).searchParams.get("codigo");
+        if (codigoParam) {
+          localStorage.setItem("codigoAcceso", codigoParam);
+        }
 
+        if (qrCodeMessage.startsWith(validBase)) {
+          localStorage.setItem("verificado", "ok");
           document.getElementById("mensaje").innerText = "✅ Código válido. Redirigiendo...";
           lector.stop();
 
