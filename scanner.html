@@ -22,13 +22,33 @@
       color: #00bfff;
       margin-bottom: 20px;
     }
-    #preview {
+    #scanner-container {
+      position: relative;
       width: 90vw;
       height: 60vh;
       border: 3px solid #00ffff;
       border-radius: 10px;
       margin-bottom: 20px;
+      overflow: hidden;
+    }
+    #preview {
+      width: 100%;
+      height: 100%;
       object-fit: cover;
+    }
+    .scanner-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: rgba(0, 255, 255, 0.8);
+      animation: scan 2s infinite;
+    }
+    @keyframes scan {
+      0% { top: 0; }
+      50% { top: 100%; }
+      100% { top: 0; }
     }
     #mensaje {
       margin-top: 20px;
@@ -49,7 +69,10 @@
 </head>
 <body>
   <h1>Escanea tu entrada al evento</h1>
-  <video id="preview" autoplay muted playsinline></video>
+  <div id="scanner-container">
+    <video id="preview" autoplay muted playsinline></video>
+    <div class="scanner-line"></div>
+  </div>
   <div id="mensaje"></div>
   <button id="reintentar" onclick="iniciarScanner()">Reintentar escaneo</button>
 
@@ -72,7 +95,6 @@
         video.removeAttribute("controls");
         video.removeAttribute("controlslist");
         video.removeAttribute("disablePictureInPicture");
-        video.play();
         escanearCodigo(video);
       } catch (error) {
         document.getElementById("mensaje").innerText = "No se pudo acceder a la cámara. Revisa los permisos.";
