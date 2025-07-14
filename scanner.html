@@ -67,8 +67,8 @@
         const url = new URL(qrCodeMessage);
         const params = new URLSearchParams(url.search);
 
-        const invitado = params.get("invitado")?.trim();
-        const anfitrion = params.get("anfitrion")?.trim();
+        const invitado = (params.get("invitado") || "").trim();
+        const anfitrion = (params.get("anfitrion") || "").trim();
 
         if (invitado && invitado.length > 0) {
           localStorage.setItem("invitado", invitado);
@@ -131,3 +131,4 @@
   </script>
 </body>
 </html>
+
