@@ -100,7 +100,7 @@
   <button id="reintentar">🔁 Escanear otro código</button>
   <br><br>
   <button id="registroManual" onclick="irFormularioManual()">📝 Registrar manualmente sin QR</button>
-  <audio id="beep" src="https://www.soundjay.com/buttons/beep-07.wav" preload="auto"></audio>
+  <audio id="beep" src="https://assets.mixkit.co/sfx/preview/mixkit-quick-win-video-game-notification-269.wav" preload="auto"></audio>
 
   <script>
     let stream;
@@ -179,6 +179,14 @@
         localStorage.setItem("codigoAcceso", codigo);
       }
       iniciarScanner();
+
+      // Activar sonido en primera interacción
+      document.body.addEventListener("click", () => {
+        const beep = document.getElementById("beep");
+        if (beep) {
+          beep.play().catch(() => {});
+        }
+      }, { once: true });
     };
 
     document.getElementById("reintentar").addEventListener("click", () => {
