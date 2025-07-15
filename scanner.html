@@ -66,7 +66,7 @@
       font-size: 18px;
       color: #ff4444;
     }
-    #reintentar, #registroManual {
+    #registroManual {
       margin-top: 10px;
       padding: 14px 28px;
       font-size: 16px;
@@ -80,11 +80,7 @@
       box-shadow: 0 0 10px #00ffff88;
       transition: transform 0.2s, box-shadow 0.2s;
     }
-    #registroManual {
-      background: rgba(255, 255, 255, 0.08);
-      color: #ffffff;
-    }
-    #reintentar:hover, #registroManual:hover {
+    #registroManual:hover {
       transform: scale(1.05);
       box-shadow: 0 0 15px #ffffff88;
     }
@@ -98,8 +94,6 @@
     <div class="scanner-line"></div>
   </div>
   <div id="mensaje"></div>
-  <button id="reintentar">🔁 Escanear otro código</button>
-  <br><br>
   <button id="registroManual" onclick="irFormularioManual()">📝 Registrar manualmente sin QR</button>
   <audio id="beep" src="https://assets.mixkit.co/sfx/preview/mixkit-quick-win-video-game-notification-269.wav" preload="auto"></audio>
 
@@ -189,10 +183,6 @@
         }
       }, { once: true });
     };
-
-    document.getElementById("reintentar").addEventListener("click", () => {
-      iniciarScanner();
-    });
 
     function irFormularioManual() {
       const formURL = "https://form.jotform.com/251940670923055";
