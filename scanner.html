@@ -20,9 +20,27 @@
     }
     h1 {
       color: #00bfff;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       font-size: 28px;
       text-shadow: 0 0 10px rgba(0,255,255,0.6);
+    }
+    #registroManual {
+      margin-bottom: 20px;
+      padding: 14px 28px;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 30px;
+      color: #00ffff;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 0 10px #00ffff88;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    #registroManual:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #ffffff88;
     }
     #estado {
       color: #888;
@@ -66,35 +84,17 @@
       font-size: 18px;
       color: #ff4444;
     }
-    #registroManual {
-      margin-top: 10px;
-      padding: 14px 28px;
-      font-size: 16px;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 30px;
-      color: #00ffff;
-      cursor: pointer;
-      font-weight: bold;
-      box-shadow: 0 0 10px #00ffff88;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    #registroManual:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 15px #ffffff88;
-    }
   </style>
 </head>
 <body>
   <h1>Escanea tu entrada al evento</h1>
+  <button id="registroManual" onclick="irFormularioManual()">📝 Registrar manualmente sin QR</button>
   <div id="estado">📡 Escaneando QR para registrar invitado y anfitrión...</div>
   <div id="scanner-container">
     <video id="preview" autoplay muted playsinline></video>
     <div class="scanner-line"></div>
   </div>
   <div id="mensaje"></div>
-  <button id="registroManual" onclick="irFormularioManual()">📝 Registrar manualmente sin QR</button>
   <audio id="beep" src="https://assets.mixkit.co/sfx/preview/mixkit-quick-win-video-game-notification-269.wav" preload="auto"></audio>
 
   <script>
@@ -175,7 +175,6 @@
       }
       iniciarScanner();
 
-      // Activar sonido en primera interacción
       document.body.addEventListener("click", () => {
         const beep = document.getElementById("beep");
         if (beep) {
@@ -185,8 +184,12 @@
     };
 
     function irFormularioManual() {
-      const formURL = "https://form.jotform.com/251940670923055";
-      window.location.href = formURL;
+      const codigoAcceso = localStorage.getItem("codigoAcceso") || "";
+      const url = new URL("https://form.jotform.com/251940670923055");
+      if (codigoAcceso) {
+        url.searchParams.set("codigo", codigoAcceso);
+      }
+      window.location.href = url.toString();
     }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
