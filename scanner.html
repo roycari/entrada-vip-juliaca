@@ -83,6 +83,21 @@
       transform: scale(1.05);
       box-shadow: 0 0 15px #00ffffcc;
     }
+    #overlay-exito {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #00ffcc;
+      color: #000;
+      padding: 20px 30px;
+      font-size: 24px;
+      font-weight: bold;
+      border-radius: 12px;
+      box-shadow: 0 0 20px #00ffcc;
+      z-index: 999;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -94,7 +109,10 @@
   </div>
   <div id="mensaje"></div>
   <button id="reintentar">🔁 Escanear otro código</button>
+  <audio id="beep" src="https://www.soundjay.com/buttons/beep-07.wav" preload="auto"></audio>
+  <div id="overlay-exito">✅ Registro exitoso</div>
 
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
   <script>
     let stream;
 
@@ -130,6 +148,7 @@
           const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
           const code = jsQR(imageData.data, canvas.width, canvas.height);
           if (code) {
+            document.getElementById("beep").play();
             procesarQR(code.data);
           } else {
             requestAnimationFrame(escanear);
@@ -155,7 +174,12 @@
           if (codigoAcceso) {
             url.searchParams.set("codigo", codigoAcceso);
           }
-          window.location.href = url.toString();
+
+          // Mostrar animación de éxito
+          document.getElementById("overlay-exito").style.display = "block";
+          setTimeout(() => {
+            window.location.href = url.toString();
+          }, 1000);
         } else {
           document.getElementById("mensaje").innerText = "QR válido, pero faltan campos requeridos (invitado o anfitrión).";
         }
@@ -177,6 +201,5 @@
       iniciarScanner();
     });
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 </body>
 </html>
