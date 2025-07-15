@@ -66,8 +66,8 @@
       font-size: 18px;
       color: #ff4444;
     }
-    #reintentar {
-      margin-top: 20px;
+    #reintentar, #registroManual {
+      margin-top: 10px;
       padding: 14px 28px;
       font-size: 16px;
       background: linear-gradient(to right, #00bfff, #00ffff);
@@ -79,24 +79,13 @@
       box-shadow: 0 0 10px #00ffff88;
       transition: transform 0.2s, box-shadow 0.2s;
     }
-    #reintentar:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 15px #00ffffcc;
+    #registroManual {
+      background: linear-gradient(to right, #444, #999);
+      color: #fff;
     }
-    #overlay-exito {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #00ffcc;
-      color: #000;
-      padding: 20px 30px;
-      font-size: 24px;
-      font-weight: bold;
-      border-radius: 12px;
-      box-shadow: 0 0 20px #00ffcc;
-      z-index: 999;
-      display: none;
+    #reintentar:hover, #registroManual:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #ffffff88;
     }
   </style>
 </head>
@@ -109,10 +98,10 @@
   </div>
   <div id="mensaje"></div>
   <button id="reintentar">🔁 Escanear otro código</button>
+  <br><br>
+  <button id="registroManual" onclick="irFormularioManual()">📝 Registrar manualmente sin QR</button>
   <audio id="beep" src="https://www.soundjay.com/buttons/beep-07.wav" preload="auto"></audio>
-  <div id="overlay-exito">✅ Registro exitoso</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
   <script>
     let stream;
 
@@ -174,12 +163,7 @@
           if (codigoAcceso) {
             url.searchParams.set("codigo", codigoAcceso);
           }
-
-          // Mostrar animación de éxito
-          document.getElementById("overlay-exito").style.display = "block";
-          setTimeout(() => {
-            window.location.href = url.toString();
-          }, 1000);
+          window.location.href = url.toString();
         } else {
           document.getElementById("mensaje").innerText = "QR válido, pero faltan campos requeridos (invitado o anfitrión).";
         }
@@ -200,6 +184,12 @@
     document.getElementById("reintentar").addEventListener("click", () => {
       iniciarScanner();
     });
+
+    function irFormularioManual() {
+      const formURL = "https://form.jotform.com/251940670923055";
+      window.location.href = formURL;
+    }
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 </body>
 </html>
