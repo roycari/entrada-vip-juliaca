@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Escanea tu entrada al evento</title>
+  <title>ESCANEA TU ENTRADA AL EVENTO</title>
   <style>
     body {
       margin: 0;
@@ -13,34 +13,36 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       height: 100vh;
-      padding: 20px;
+      padding: 40px 20px 20px 20px;
       text-align: center;
     }
     h1 {
-      color: #00bfff;
-      margin-bottom: 10px;
-      font-size: 28px;
-      text-shadow: 0 0 10px rgba(0,255,255,0.6);
+      color: #00ffff;
+      margin-bottom: 20px;
+      font-size: 32px;
+      font-weight: bold;
+      text-transform: uppercase;
+      text-shadow: 0 0 20px rgba(0,255,255,0.9), 0 0 30px rgba(0,255,255,0.7);
     }
     #registroManual {
-      margin-bottom: 20px;
-      padding: 14px 28px;
-      font-size: 16px;
+      margin-bottom: 30px;
+      padding: 16px 32px;
+      font-size: 18px;
       background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 30px;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 40px;
       color: #00ffff;
       cursor: pointer;
       font-weight: bold;
-      box-shadow: 0 0 10px #00ffff88;
+      box-shadow: 0 0 20px #00ffffaa, 0 0 40px #00ffff66;
       transition: transform 0.2s, box-shadow 0.2s;
     }
     #registroManual:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 15px #ffffff88;
+      transform: scale(1.08);
+      box-shadow: 0 0 25px #ffffffaa, 0 0 50px #00ffff88;
     }
     #scanner-container {
       position: relative;
@@ -51,7 +53,7 @@
       border-radius: 16px;
       margin-bottom: 20px;
       overflow: hidden;
-      box-shadow: 0 0 20px #00ffff44;
+      box-shadow: 0 0 30px #00ffff55, 0 0 60px #00ffff33;
     }
     #preview {
       width: 100%;
@@ -66,7 +68,7 @@
       width: 100%;
       height: 4px;
       background: linear-gradient(90deg, #00ffff, #00bfff);
-      box-shadow: 0 0 12px #00ffff;
+      box-shadow: 0 0 16px #00ffff;
       animation: scan 2s infinite;
     }
     @keyframes scan {
@@ -82,7 +84,7 @@
   </style>
 </head>
 <body>
-  <h1>Escanea tu entrada al evento</h1>
+  <h1>ESCANEA TU ENTRADA AL EVENTO</h1>
   <button id="registroManual" onclick="irFormularioManual()">📝 Registrar manualmente sin QR</button>
   <div id="scanner-container">
     <video id="preview" autoplay muted playsinline></video>
