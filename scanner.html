@@ -83,6 +83,29 @@
       font-size: 18px;
       color: #ff4444;
     }
+    .overlay-aprobado {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(0, 255, 128, 0.12);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      animation: fadeOut 2s forwards 1s;
+    }
+    .overlay-aprobado h2 {
+      color: #00ffcc;
+      font-size: 32px;
+      font-weight: bold;
+      text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc;
+    }
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
   </style>
 </head>
 <body>
@@ -93,6 +116,9 @@
     <div class="scanner-line"></div>
   </div>
   <div id="mensaje"></div>
+  <div id="overlay" class="overlay-aprobado" style="display:none;">
+    <h2>✅ ACCESO APROBADO</h2>
+  </div>
   <audio id="beep" src="https://assets.mixkit.co/sfx/preview/mixkit-quick-win-video-game-notification-269.wav" preload="auto"></audio>
 
   <script>
@@ -131,7 +157,8 @@
           const code = jsQR(imageData.data, canvas.width, canvas.height);
           if (code) {
             document.getElementById("beep").play();
-            procesarQR(code.data);
+            mostrarOverlay();
+            setTimeout(() => procesarQR(code.data), 1500);
           } else {
             requestAnimationFrame(escanear);
           }
@@ -140,6 +167,11 @@
         }
       }
       requestAnimationFrame(escanear);
+    }
+
+    function mostrarOverlay() {
+      const overlay = document.getElementById("overlay");
+      overlay.style.display = "flex";
     }
 
     function procesarQR(data) {
@@ -193,4 +225,3 @@
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 </body>
 </html>
-
