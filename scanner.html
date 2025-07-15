@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESCANEA TU ENTRADA AL EVENTO</title>
+  <title>ESCANEA TU ENTRADA</title>
   <style>
     body {
       margin: 0;
@@ -21,28 +21,28 @@
     h1 {
       color: #00ffff;
       margin-bottom: 20px;
-      font-size: 32px;
+      font-size: 34px;
       font-weight: bold;
       text-transform: uppercase;
-      text-shadow: 0 0 20px rgba(0,255,255,0.9), 0 0 30px rgba(0,255,255,0.7);
+      text-shadow: 0 0 30px rgba(0,255,255,0.9), 0 0 40px rgba(0,255,255,0.7);
     }
     #registroManual {
       margin-bottom: 30px;
-      padding: 16px 32px;
+      padding: 18px 36px;
       font-size: 18px;
       background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
       border-radius: 40px;
       color: #00ffff;
       cursor: pointer;
       font-weight: bold;
-      box-shadow: 0 0 20px #00ffffaa, 0 0 40px #00ffff66;
-      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 25px #00ffffaa, 0 0 50px #00ffff66, 0 0 10px #00ffff33 inset;
+      transition: transform 0.3s, box-shadow 0.3s;
     }
     #registroManual:hover {
-      transform: scale(1.08);
-      box-shadow: 0 0 25px #ffffffaa, 0 0 50px #00ffff88;
+      transform: scale(1.1);
+      box-shadow: 0 0 30px #ffffffaa, 0 0 60px #00ffff88;
     }
     #scanner-container {
       position: relative;
@@ -84,8 +84,8 @@
   </style>
 </head>
 <body>
-  <h1>ESCANEA TU ENTRADA AL EVENTO</h1>
-  <button id="registroManual" onclick="irFormularioManual()">📝 Registrar manualmente sin QR</button>
+  <h1>ESCANEA TU ENTRADA</h1>
+  <button id="registroManual" onclick="irFormularioManual()">📝 REGISTRO MANUAL</button>
   <div id="scanner-container">
     <video id="preview" autoplay muted playsinline></video>
     <div class="scanner-line"></div>
